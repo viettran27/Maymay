@@ -20,22 +20,6 @@ const configs = [
         key: "Line"
     },
     {
-        name: "Sản lượng",
-        key: "Qty_P"
-    },
-    {
-        name: "SAH",
-        key: "SAH_P"
-    },
-    {
-        name: "Thời gian",
-        key: "Hours_P"
-    },
-    {
-        name: "Số công nhân",
-        key: "Worker_P"
-    },
-    {
         name: "Ngày",
         key: "WorkDate",
         format: (date_str) => {
