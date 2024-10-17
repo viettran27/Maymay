@@ -1,0 +1,1 @@
+pnpm run dev --mode=development --host=0.0.0.0 --port=89

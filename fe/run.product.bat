@@ -1,0 +1,1 @@
+pnpm run dev --mode=production --host=0.0.0.0
