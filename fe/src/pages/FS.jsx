@@ -107,8 +107,12 @@ const FS = () => {
             setData(res.data)
             hideLoading()
             callback && callback()
+        }).catch((e) => {
+            hideLoading()
+            showMessage("err", e?.response?.data?.message || "Có lỗi hệ thống, vui lòng thử lại sau")
         })
     }
+
 
     const handleGetSample = () => {
         const link = document.createElement('a');
