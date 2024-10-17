@@ -1,12 +1,15 @@
+import { useEffect, useState } from "react"
+import { useDebounceCallback } from "@/hooks/useDebounce"
+
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { useEffect, useState } from "react"
-import apiClient from "@/api/axios"
 import { useLoading } from "@/store/loading"
-import { useDebounceCallback } from "@/hooks/useDebounce"
-import { X, Pencil, Plus } from "lucide-react"
 import UploadFile from "@/components/UploadFile"
 import { Dialog, DialogHeader, DialogTitle, DialogContent, DialogTrigger, DialogDescription, DialogFooter, DialogClose } from "@/components/ui/dialog"
+import { HoverCard, HoverCardTrigger, HoverCardContent } from "@/components/ui/hover-card"
+
+import { X, Pencil, Plus, TriangleAlert } from "lucide-react"
+import apiClient from "@/api/axios"
 import { useToast } from "@/store/toast"
 
 const config = [
@@ -89,6 +92,7 @@ const FS = () => {
 
     const [styleSearch, setStyleSearch] = useState("")
     const [file, setFile] = useState(null)
+    const [styleNotHave, setStyleNotHave] = useState([])
     const [data, setData] = useState([])
     const [styleValue, setStylevalue] = useState(INIT_STYLE)
     const [openDialog, setOpenDialog] = useState(false)
@@ -98,8 +102,20 @@ const FS = () => {
     })
 
     useEffect(() => {
+        getStyleNotHave()
         getData(styleSearch)
     }, [])
+
+    const getStyleNotHave = () => {
+        showLoading()
+        apiClient.get("/api_fs/styles_not_have").then(res => {
+            setStyleNotHave(res.data)
+            hideLoading()
+        }).catch((e) => {
+            hideLoading()
+            showMessage("err", e?.response?.data?.message || "Có lỗi hệ thống, vui lòng thử lại sau")
+        })
+    }
 
     const getData = (style, callback) => {
         showLoading()
@@ -207,6 +223,22 @@ const FS = () => {
                             <Button className="bg-red-500 px-2 hover:bg-red-600" onClick={handleDeleteSearch}>
                                 <X/> 
                             </Button> 
+                        }
+                        {
+                            styleNotHave.length > 0 &&
+                            <HoverCard openDelay={50} closeDelay={50}>
+                                <HoverCardTrigger>
+                                    <TriangleAlert color="#f5e342" size={30} className="cursor-pointer"/>
+                                </HoverCardTrigger>   
+                                <HoverCardContent className="w-max">
+                                    <div className="font-bold mb-2">Danh sách style thiếu</div>
+                                    {
+                                        styleNotHave.map((item, index) => (
+                                            <div key={index} className="[:not(:first-child)]:mt-1">{item}</div>
+                                        ))
+                                    }
+                                </HoverCardContent>
+                            </HoverCard>
                         }
                     </div>
                     <Dialog open={openDialog} onOpenChange={setOpenDialog}>

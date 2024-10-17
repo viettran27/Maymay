@@ -21,8 +21,11 @@ async def get_ppc(workdate: date = None, style: str = None, line: str = None, pa
         conditions = []
         for column, value in filters.items():
             if value is not None:
-                conditions.append(f"{column} = '{value}'")
-        
+                if column == "WorkDate":
+                    conditions.append(f"{column} = '{value}'")
+                else:
+                    conditions.append(f"{column} LIKE '%{value}%'")
+                    
         if conditions:
             query += " WHERE " + " AND ".join(conditions)
         

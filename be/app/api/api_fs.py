@@ -128,3 +128,13 @@ async def post_style(data: dict = Body(...)):
         return {"message": "Cập nhật dữ liệu thành công!"}
     except:
         HTTPException(status_code=500, detail="Internal server error")
+
+
+@router.get("/styles_not_have")
+async def get_styles_not_have(db: Session = Depends(get_db_1)):
+    try:
+        res = db.execute(text("SELECT * FROM DS_STYLE_CHUA_CO_FS WHERE STYLE IS NOT NULL")).fetchall()
+        data = [dict(row._mapping)["STYLE"] for row in res]
+        return {"data": data}
+    except:
+        HTTPException(status_code=500, detail="Internal server error")
