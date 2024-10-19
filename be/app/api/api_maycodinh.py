@@ -171,7 +171,7 @@ async def post_excel(file: UploadFile = File(...), month: int = Form(...), year:
                 if type(col) == int:
                     day = str(col)
                 new_data.append({"Khu_vuc": row["Khu vực"].strip(), "Nha_may": fac, "Loai_may": row["Loại máy"], "Ngay": datetime(int(year), int(month), int(day.split("/")[0])), "So_luong": row[col] if not math.isnan(row[col]) else 0})
-        print(new_data)
+
         dtype = {
             "Khu_vuc": NVARCHAR(100),
             "Nha_may": VARCHAR(3),
