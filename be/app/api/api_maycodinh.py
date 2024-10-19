@@ -162,14 +162,16 @@ async def post_excel(file: UploadFile = File(...), month: int = Form(...), year:
 
         df = pd.read_excel(file.file)
         df["Khu vực"].ffill(inplace=True)
+        
         data = df.to_dict('records')
-
-
         new_data = []
         for row in data:
             for col in df.columns[2:]:
-                new_data.append({"Khu_vuc": row["Khu vực"].strip(), "Nha_may": fac, "Loai_may": row["Loại máy"], "Ngay": datetime(int(year), int(month), int(col.split("/")[0])), "So_luong": row[col] if not math.isnan(row[col]) else 0})
-
+                day = col
+                if type(col) == int:
+                    day = str(col)
+                new_data.append({"Khu_vuc": row["Khu vực"].strip(), "Nha_may": fac, "Loai_may": row["Loại máy"], "Ngay": datetime(int(year), int(month), int(day.split("/")[0])), "So_luong": row[col] if not math.isnan(row[col]) else 0})
+        print(new_data)
         dtype = {
             "Khu_vuc": NVARCHAR(100),
             "Nha_may": VARCHAR(3),
