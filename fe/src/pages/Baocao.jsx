@@ -6,9 +6,9 @@ import Loading from "@/components/Loading"
 const BaoCao = () => {
     const { showLoading, hideLoading } = useLoading((state) => state)
 
-    useEffect(() => {
-        showLoading()
-    }, [])
+    // useEffect(() => {
+    //     showLoading()
+    // }, [])
 
     return (
         <div className="w-full relative">
