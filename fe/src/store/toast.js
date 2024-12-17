@@ -6,7 +6,7 @@ export const useToast = create((set) => ({
     message: '',
     showMessage: (type, message) => {
         set({ show: true, type, message })
-        setTimeout(() => set({ show: false, message: '' }), 5000)
+        setTimeout(() => set({ show: false, type: '', message: '' }), 5000)
     },
-    hideMessage: () => set({ show: false, message: '' }),
+    hideMessage: () => set({ show: false, type: '', message: '' }),
 }))

@@ -1,10 +1,9 @@
-import { useEffect } from "react"
 import { useLoading } from "@/store/loading"
 import SideBar from "@/components/SideBar"
 import Loading from "@/components/Loading"
 
 const BaoCao = () => {
-    const { showLoading, hideLoading } = useLoading((state) => state)
+    const { hideLoading } = useLoading((state) => state)
 
     // useEffect(() => {
     //     showLoading()

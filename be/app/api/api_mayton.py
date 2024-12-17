@@ -8,21 +8,14 @@ from app.db.base import engine_1, get_db_1
 from sqlalchemy.orm import Session
 from app.helper.utils import get_days_in_month
 from openpyxl.styles import Border, Side, Alignment
-from datetime import datetime
-import math
+from datetime import datetime, timedelta
 
 router = APIRouter()
 
-STATUS = {
-    "OK": "OK",
-    "Hong": "Hỏng",
-}
-
-def get_data(fac, status, month, year, db):
+def get_data(fac, status, location, month, year, db):
     try:
-        res = db.execute(text(f"SELECT * FROM MAYTON WHERE MONTH(Ngay) = {month} AND YEAR(Ngay) = {year} AND Nha_may = '{fac}' AND Trang_thai = N'{STATUS[status]}' ORDER BY Loai_may, Ngay")).fetchall()
+        res = db.execute(text(f"SELECT * FROM MAYTON WHERE MONTH(Ngay) = {month} AND YEAR(Ngay) = {year} AND Nha_may = '{fac}' AND Trang_thai = N'{status}'{f" AND Chi_tiet = N'{location}'" if location != "null" else ''} ORDER BY Loai_may, Ngay")).fetchall()
         data = [dict(row._mapping) for row in res]
-
         days = get_days_in_month(month, year)
 
         new_data = {}
@@ -37,7 +30,8 @@ def get_data(fac, status, month, year, db):
             new_data[loai_may][ngay-1] = so_luong
         
         return new_data
-    except:
+    except Exception as e:
+        print(e)
         HTTPException(status_code=500, detail="Internal server error")
 
 @router.get("/export")
@@ -120,30 +114,137 @@ async def get_excel(month: int, year: int, fac: str, status: str, db: Session = 
     except:
         HTTPException(status_code=500, detail="Internal server error")
 
-@router.post("/")
-async def post_excel(file: UploadFile = File(...), month: str = Form(...), year: str = Form(...), status: str = Form(...), fac: str = Form(...)):
+@router.post("/NT1")
+async def post_excel(date_from: datetime = Form(...), date_to: datetime = Form(...), file: UploadFile = File(...)):
     try:
-        df = pd.read_excel(file.file)
-        df.ffill()
+        df = pd.read_excel(file.file, sheet_name='Tổng hợp', skiprows=4, header=[0, 1])
         data = df.to_dict('records')
-
-        new_data = []
-        for row in data:
-            for col in df.columns[1:]:
-                day = col
-                if type(col) == int:
-                    day = str(col)
-                new_data.append({"Loai_may": row["Loại máy"], "Trang_thai": STATUS[status], "Ngay": datetime(int(year), int(month), int(day.split("/")[0])), "Nha_may": fac, "So_luong": row[col] if not math.isnan(row[col]) else 0})
         
+        main = []
+
+        status = ["Máy cho mượn", "Máy mượn", "Máy thuê", "Xuất bán thanh lý"]
+        key_pair = {
+            "Máy cho mượn": "1",
+            "Máy mượn": "2",
+            "Máy thuê": "3",
+            "Xuất bán thanh lý": "4"
+        }
+
+        machine_data = {}
+        for row in data:
+            type = row[('Loại máy', 'Unnamed: 1_level_1')]
+            if not pd.isna(type):
+                if not machine_data.get(type):
+                    machine_data[type] = {}
+
+                for key, value in row.items():                    
+                    if key[0].strip() in status:
+                        stt = key[0].strip()
+                        location = key[1].strip()
+
+                        if not machine_data[type].get(stt):
+                            machine_data[type][stt] = {}
+
+                        if not machine_data[type][stt].get(location):
+                            machine_data[type][stt][location] = 0
+
+                        machine_data[type][stt][location] += 0 if pd.isna(value) else value 
+            else:
+                continue
+
+        for loai_may, value in machine_data.items():
+            for stt, value_stt in value.items():
+                for location, total in value_stt.items():
+                    current_date = date_from
+                    while current_date <= date_to:
+                        row_data = {}
+                        row_data["Loai_may"] = loai_may
+                        row_data["Trang_thai"] = key_pair.get(stt)
+                        row_data["Ngay"] = current_date
+                        row_data["Nha_may"] = 'NT1'
+                        row_data["So_luong"] = total
+                        row_data["Chi_tiet"] = location if 'Unnamed' not in location else None
+                        current_date += timedelta(days=1)
+                        main.append(row_data)
+
         dtype = {
             "Loai_may": NVARCHAR(200),
             "Trang_thai": NVARCHAR(20),
             "Ngay": DATE,
             "Nha_may": VARCHAR(3),   
-            "So_luong": INTEGER
+            "So_luong": INTEGER,
+            "Chi_tiet": NVARCHAR(100)
         }
-        df_new = pd.DataFrame(new_data)
-        import_to_sql(df_new, "MAYTON", dtype, engine_1)
+        frame = pd.DataFrame(main)
+        import_to_sql(frame, "MAYTON", dtype, engine_1)
+
+        return {"message": "Cập nhật dữ liệu thành công!"}
+    except Exception as e:
+        print(e)
+        HTTPException(status_code=500, detail="Internal server error")
+
+@router.post("/NT2")
+async def post_excel2(date_from: datetime = Form(...), date_to: datetime = Form(...), file: UploadFile = File(...)):
+    try:
+        df = pd.read_excel(file.file, sheet_name=0, skiprows=7, header=[0, 1])
+        data = df.to_dict('records')
+        main = []
+
+        status = ["Máy cho Hải Phòng mượn", "Máy mượn Hải Phòng", "Máy thuê"]
+        key_pair = {
+            "Máy cho Hải Phòng mượn": "1",
+            "Máy mượn Hải Phòng": "2",
+            "Máy thuê": "3"
+        }
+
+        machine_data = {}
+
+        for row in data:
+            type = row[('Loại máy', 'Unnamed: 2_level_1')]
+            if not pd.isna(type):
+                if not machine_data.get(type):
+                    machine_data[type] = {}
+
+                for key, value in row.items():                    
+                    if key[0].strip() in status:
+                        stt = key[0].strip()
+                        location = key[1].strip()
+
+                        if not machine_data[type].get(stt):
+                            machine_data[type][stt] = {}
+
+                        if not machine_data[type][stt].get(location):
+                            machine_data[type][stt][location] = 0
+
+                        machine_data[type][stt][location] += 0 if pd.isna(value) else value 
+            else:
+                continue
+
+        for loai_may, value in machine_data.items():
+            for stt, value_stt in value.items():
+                for location, total in value_stt.items():
+                    current_date = date_from
+                    while current_date <= date_to:
+                        row_data = {}
+                        row_data["Loai_may"] = loai_may
+                        row_data["Trang_thai"] = key_pair.get(stt)
+                        row_data["Ngay"] = current_date
+                        row_data["Nha_may"] = 'NT2'
+                        row_data["So_luong"] = total
+                        row_data["Chi_tiet"] = location if 'Unnamed' not in location else "Hải Phòng"
+                        current_date += timedelta(days=1)
+                        main.append(row_data)
+
+        dtype = {
+            "Loai_may": NVARCHAR(200),
+            "Trang_thai": NVARCHAR(20),
+            "Ngay": DATE,
+            "Nha_may": VARCHAR(3),   
+            "So_luong": INTEGER,
+            "Chi_tiet": NVARCHAR(100)
+        }
+        frame = pd.DataFrame(main)
+        import_to_sql(frame, "MAYTON", dtype, engine_1)
 
         return {"message": "Cập nhật dữ liệu thành công!"}
     except Exception as e:
@@ -151,9 +252,9 @@ async def post_excel(file: UploadFile = File(...), month: str = Form(...), year:
         HTTPException(status_code=500, detail="Internal server error")
 
 @router.get("/")
-async def get_mayton(db: Session = Depends(get_db_1), month: int = None, year: int = None, fac: str = "NT1", status: str = "OK"):
+async def get_mayton(db: Session = Depends(get_db_1), month: int = None, year: int = None, location: str = None, fac: str = "NT1", status: str = "1"):
     try:
-        data = get_data(fac, status, month, year, db)
+        data = get_data(fac, status, location, month, year, db)
         return {"data": data}
     except:
         HTTPException(status_code=500, detail="Internal server error")

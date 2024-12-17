@@ -26,7 +26,7 @@ const Toast = () => {
     return (
         <div
             ref={toast}
-            className={`fixed flex gap-2 transform translate-x-[calc(100%+20px)] transition-all duration-100 z-20 right-5 top-[95px] px-2 py-3 rounded-lg text-white ${type === "success" ? "bg-green-600" : "bg-red-600"}`}
+            className={`fixed flex gap-2 transform translate-x-[calc(100%+20px)] transition-all duration-100 z-20 right-5 top-[95px] px-2 py-3 rounded-lg text-white ${!type ? '' : type === "success" ? "bg-green-600" : "bg-red-600"}`}
         >
             <span>{message}</span>
             <CircleX className='cursor-pointer' onClick={hideMessage}/>
