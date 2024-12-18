@@ -251,6 +251,18 @@ async def post_excel2(date_from: datetime = Form(...), date_to: datetime = Form(
         print(e)
         HTTPException(status_code=500, detail="Internal server error")
 
+@router.get("/machines")
+async def get_machines(db: Session = Depends(get_db_1)):
+    try:
+        query = text("SELECT DISTINCT Loai_may FROM MAYTON")
+        result = db.execute(query).fetchall()
+        data = [row[0] for row in result]
+        return data
+    except Exception as e:
+        print(e)
+        return []
+    
+
 @router.get("/")
 async def get_mayton(db: Session = Depends(get_db_1), month: int = None, year: int = None, location: str = None, fac: str = "NT1", status: str = "1"):
     try:

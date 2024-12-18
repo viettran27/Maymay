@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from 'react'
 import { useLoading } from '@/store/loading'
 import apiClient from "@/api/axios"
 import { getDayInMonth, getFirstDateOfMonth, getLastDateOfMonth } from '@/lib/utils'
-import { machines, STATUS } from '@/constants/machine'
+import { STATUS } from '@/constants/machine'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Select, SelectGroup, SelectTrigger, SelectContent, SelectValue, SelectItem } from '@/components/ui/select'
@@ -23,6 +23,7 @@ const Mayton = () => {
         value: null,
         fac: null
     })
+    const [machines, setMachines] = useState([])
     const [data, setData] = useState({})
     const [fac, setFac] = useState("NT1")
     const [status, setStatus] = useState("1")
@@ -50,10 +51,16 @@ const Mayton = () => {
     }, [action.current])
 
     useEffect(() => {
+        getMachines()
         getData(fac, status, location, month, year)
 
         // eslint-disable-next-line 
     }, [])
+
+    const getMachines = () => {
+        apiClient.get(`/api_mayton/machines`)
+        .then(data => setMachines(data))
+    }
 
     const getData = useDebounceCallback((fac, status, location, month, year, callback) => {
         if (!year) {
