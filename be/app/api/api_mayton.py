@@ -122,12 +122,13 @@ async def post_excel(date_from: datetime = Form(...), date_to: datetime = Form(.
         
         main = []
 
-        status = ["Máy cho mượn", "Máy mượn", "Máy thuê", "Xuất bán thanh lý"]
+        status = ["Máy cho mượn", "Máy mượn", "Máy thuê", "Xuất bán thanh lý", "Số lượng"]
         key_pair = {
             "Máy cho mượn": "Cho mượn",
             "Máy mượn": "Mượn",
             "Máy thuê": "Thuê",
-            "Xuất bán thanh lý": "Thanh lý"
+            "Xuất bán thanh lý": "Thanh lý",
+            "Số lượng": "Tồn"
         }
 
         machine_data = {}
@@ -163,7 +164,7 @@ async def post_excel(date_from: datetime = Form(...), date_to: datetime = Form(.
                         row_data["Ngay"] = current_date
                         row_data["Nha_may"] = 'NT1'
                         row_data["So_luong"] = total
-                        row_data["Chi_tiet"] = location if 'Unnamed' not in location else None
+                        row_data["Chi_tiet"] = location if (('Unnamed' not in location) and location != "Tổng") else None
                         current_date += timedelta(days=1)
                         main.append(row_data)
 
@@ -190,11 +191,12 @@ async def post_excel2(date_from: datetime = Form(...), date_to: datetime = Form(
         data = df.to_dict('records')
         main = []
 
-        status = ["Máy cho Hải Phòng mượn", "Máy mượn Hải Phòng", "Máy thuê"]
+        status = ["Máy cho Hải Phòng mượn", "Máy mượn Hải Phòng", "Máy thuê", "Số lượng mua"]
         key_pair = {
             "Máy cho Hải Phòng mượn": "Cho mượn",
             "Máy mượn Hải Phòng": "Mượn",
-            "Máy thuê": "Thuê"
+            "Máy thuê": "Thuê",
+            "Số lượng mua": "Tồn"
         }
 
         machine_data = {}
@@ -231,7 +233,7 @@ async def post_excel2(date_from: datetime = Form(...), date_to: datetime = Form(
                         row_data["Ngay"] = current_date
                         row_data["Nha_may"] = 'NT2'
                         row_data["So_luong"] = total
-                        row_data["Chi_tiet"] = location if 'Unnamed' not in location else "Hải Phòng"
+                        row_data["Chi_tiet"] = None if stt == 'Số lượng mua' else location if 'Unnamed' not in location else "Hải Phòng"
                         current_date += timedelta(days=1)
                         main.append(row_data)
 
