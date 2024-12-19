@@ -17,26 +17,26 @@ export const machines = [
 
 export const STATUS = {
     "NT1": {
-        "1": [
+        "Cho mượn": [
             {name: "Nghệ An", value: "Nghệ An"},
             {name: "Tinh Lợi", value: "Tinh Lợi"},
             {name: "Đại Dương", value: "Đại Dương"}
         ],
-        "2": [
+        "Mượn": [
             {name: "Nghệ An", value: "Nghệ An"},
             {name: "Đại Dương", value: "Đại Dương"}
         ],
-        "3": [
+        "Thuê": [
             {name: "Phồn Thịnh", value: "Phồn Thịnh"},
             {name: "Thành Hưng", value: "Thành Hưng"},
             {name: "Cường Huế", value: "Cường Huế"}
         ],
-        "4": []
+        "Thanh lý": []
     },
     "NT2": {
-        "1": [{name: "Hải Phòng", value: "Hải Phòng"}],
-        "2": [{name: "Hải Phòng", value: "Hải Phòng"}],
-        "3": [
+        "Cho mượn": [{name: "Hải Phòng", value: "Hải Phòng"}],
+        "Mượn": [{name: "Hải Phòng", value: "Hải Phòng"}],
+        "Thuê": [
             {name: "Tuấn Anh", value: "Tuấn Anh"},
             {name: "Phồn Thịnh", value: "Phồn Thịnh"},
             {name: "Cường Huế", value: "Cường Huế"}

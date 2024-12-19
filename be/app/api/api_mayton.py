@@ -124,10 +124,10 @@ async def post_excel(date_from: datetime = Form(...), date_to: datetime = Form(.
 
         status = ["Máy cho mượn", "Máy mượn", "Máy thuê", "Xuất bán thanh lý"]
         key_pair = {
-            "Máy cho mượn": "1",
-            "Máy mượn": "2",
-            "Máy thuê": "3",
-            "Xuất bán thanh lý": "4"
+            "Máy cho mượn": "Cho mượn",
+            "Máy mượn": "Mượn",
+            "Máy thuê": "Thuê",
+            "Xuất bán thanh lý": "Thanh lý"
         }
 
         machine_data = {}
@@ -192,9 +192,9 @@ async def post_excel2(date_from: datetime = Form(...), date_to: datetime = Form(
 
         status = ["Máy cho Hải Phòng mượn", "Máy mượn Hải Phòng", "Máy thuê"]
         key_pair = {
-            "Máy cho Hải Phòng mượn": "1",
-            "Máy mượn Hải Phòng": "2",
-            "Máy thuê": "3"
+            "Máy cho Hải Phòng mượn": "Cho mượn",
+            "Máy mượn Hải Phòng": "Mượn",
+            "Máy thuê": "Thuê"
         }
 
         machine_data = {}

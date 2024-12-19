@@ -26,7 +26,7 @@ const Mayton = () => {
     const [machines, setMachines] = useState([])
     const [data, setData] = useState({})
     const [fac, setFac] = useState("NT1")
-    const [status, setStatus] = useState("1")
+    const [status, setStatus] = useState("Cho mượn")
     const [month, setMonth] = useState(new Date().getMonth() + 1)
     const [year, setYear] = useState(new Date().getFullYear())
     const [date, setDate] = useState({
@@ -189,14 +189,14 @@ const Mayton = () => {
                         </SelectTrigger>
                         <SelectContent>
                             <SelectGroup>
-                                <SelectItem value="1">Cho mượn</SelectItem>
-                                <SelectItem value="2">Mượn</SelectItem>
-                                <SelectItem value="3">Máy thuê</SelectItem>
-                                <SelectItem value="4">Thanh lý</SelectItem>
+                                <SelectItem value="Cho mượn">Cho mượn</SelectItem>
+                                <SelectItem value="Mượn">Mượn</SelectItem>
+                                <SelectItem value="Thuê">Máy thuê</SelectItem>
+                                <SelectItem value="Thanh lý">Thanh lý</SelectItem>
                             </SelectGroup>
                         </SelectContent>
                     </Select>
-                    <div className={`items-center gap-2 ${status !== "4" ? "flex" : "hidden"}`} >
+                    <div className={`items-center gap-2 ${status !== "Thanh lý" ? "flex" : "hidden"}`} >
                         <div className='font-bold ml-2'>Vị trí</div>
                         <Select value={location} onValueChange={new_location => getData(fac, status, new_location, month, year, () => setLocation(new_location))}>
                             <SelectTrigger className="w-[120px]">
